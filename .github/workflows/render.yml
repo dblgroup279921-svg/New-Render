@@ -1,0 +1,41 @@
+name: Render Video
+on:
+  workflow_dispatch:
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Extract and Verify Zip
+        run: |
+          unzip cinematic-look-video.zip -d project_files
+          if [ -d "project_files/cinematic-look-video" ]; then
+            cp -r project_files/cinematic-look-video/* .
+            cp -r project_files/cinematic-look-video/.* . || true
+          else
+            cp -r project_files/* .
+            cp -r project_files/.* . || true
+          fi
+
+      - name: Install Remotion Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk-bridge2.0-0 libx11-xcb1 libxcb-dri3-0 libxcomposite1 libxcursor1 libxdamage1 libxi6 libxrandr2 libxss1 libxtst6 libpango-1.0-0 libasound2
+          npm install
+
+      - name: Render Video
+        run: npx remotion render Root public/video.mp4 --browser chromium
+
+      - name: Upload Video Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-video
+          path: public/video.mp4
