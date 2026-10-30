@@ -5,6 +5,8 @@ on:
 jobs:
   render:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,8 +33,11 @@ jobs:
       - name: Render Video
         run: npx remotion render src/index.ts Main out/video.mp4 --browser chromium
 
-      - name: Upload Video Artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: rendered-video
-          path: out/video.mp4
+          tag_name: video-release
+          name: "Your Rendered Video"
+          files: out/video.mp4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
