@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Extract Zip Files
+      - name: Extract Zip
         run: |
           unzip cinematic-look-video.zip -d project_files
           if [ -d "project_files/cinematic-look-video" ]; then
@@ -28,12 +28,8 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Remotion Render
-        uses: remotion-dev/github-action@v1
-        with:
-          entry-point: src/index.ts
-          composition-id: Main
-          output-location: out/video.mp4
+      - name: Render Video
+        run: npx remotion render src/index.ts Main out/video.mp4 --browser chromium
 
       - name: Upload Video Artifact
         uses: actions/upload-artifact@v4
