@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Extract and Verify Zip
+      - name: Extract Zip Files
         run: |
           unzip cinematic-look-video.zip -d project_files
           if [ -d "project_files/cinematic-look-video" ]; then
@@ -25,17 +25,18 @@ jobs:
             cp -r project_files/.* . || true
           fi
 
-      - name: Install Remotion Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libnss3 libatk-bridge2.0-0 libx11-xcb1 libxcb-dri3-0 libxcomposite1 libxcursor1 libxdamage1 libxi6 libxrandr2 libxss1 libxtst6 libpango-1.0-0 libasound2
-          npm install
+      - name: Install Dependencies
+        run: npm install
 
-      - name: Render Video
-        run: npx remotion render Root public/video.mp4 --browser chromium
+      - name: Remotion Render
+        uses: remotion-dev/github-action@v1
+        with:
+          entry-point: src/index.ts
+          composition-id: Main
+          output-location: out/video.mp4
 
       - name: Upload Video Artifact
         uses: actions/upload-artifact@v4
         with:
           name: rendered-video
-          path: public/video.mp4
+          path: out/video.mp4
